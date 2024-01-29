@@ -19,21 +19,31 @@ def read_xml(path):
     tree = et.parse(path)
     root = tree.getroot()
 
+    #DOP
+    dop_acq = root.find('specific').find('datatakeStart').text
+    dop = dop_acq.split('T')[0]
+
+    #Sun Elevation Angle
+    dict_sun_ele = {}
+    sun_ele = root.find('specific').find('sunElevationAngle')
+    for ele in sun_ele:
+        dict_sun_ele[ele.tag] = ele.text
+
     #Band Characteristics
     bnd_ch = root.find('specific').find('bandCharacterisation')
 
     #Writing the Gain and Offset of each band to a dictionary with key as the Band Number and a tuple of gain and offset value
-    dict = {}
+    dict_gain_offset = {}
     for band in bnd_ch.findall('bandID'):
         gain = float(band.find('GainOfBand').text)
         offset = float(band.find('OffsetOfBand').text)
 
-        dict[band.attrib['number']] = (gain, offset)
+        dict_gain_offset[band.attrib['number']] = (gain, offset)
 
-    return(dict)
+    return(dict_gain_offset, dop, dict_sun_ele)
 
 
 if __name__ == '__main__':
-    meta_path = 'X:\CNEXGH~Q\S3H2YZ~F\EnMap\D62VX0~O\DIAPR7~B\EA5TAS~0.L1C\E0WEA6~M.110\EYR5OA~7\EJB9VA~V.XML'
+    meta_path = 'Z:\DQE\cvss\EnMap\ENMAP01-____L1C-DT0000004688_20221022T094657Z_004_V010400_20231227T165538Z\ENMAP01-____L1C-DT0000004688_20221022T094657Z_004_V010400_20231227T165538Z-METADATA.XML'
     print('Reading the file:', meta_path)
     read_xml(meta_path)
